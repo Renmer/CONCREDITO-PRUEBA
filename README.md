@@ -11,3 +11,5 @@ Para el frontend(VueJs):
 ->Dentro de la carpeta frontend ejecutar el comando "npm install"
 ->Para inicializar el servidor "npm run serve"
 
+Nota: Faltan muchas validaciones que no pude añadir por el tiempo.
+
