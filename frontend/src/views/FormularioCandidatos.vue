@@ -1,71 +1,104 @@
 <template>
     <div>
         <h1>Captura de informacion del prospecto</h1>
-        <b-form @submit="enviar">
-
-            <b-form-input id="input-1" v-model="form.nombre" type="text" placeholder="Nombre (requerido)" required></b-form-input>
-            <b-form-input id="input-2" v-model="form.paterno" type="text" placeholder="Apellido paterno (requerido)" required></b-form-input>
-            <b-form-input id="input-3" v-model="form.materno" type="text" placeholder="Apellido materno"></b-form-input>
+        <b-form @submit.prevent="enviar">
+            <h4><b>Informacion del prospecto</b></h4>
+            <b-form-input id="input-1" v-model="formData.nombre" type="text" placeholder="Nombre (requerido)" required></b-form-input>
+            <b-form-input id="input-2" v-model="formData.apellido_paterno" type="text" placeholder="Apellido paterno (requerido)" required></b-form-input>
+            <b-form-input id="input-3" v-model="formData.apellido_materno" type="text" placeholder="Apellido materno"></b-form-input>
+            <b-form-input id="input-9" v-model="formData.rfc" type="text" placeholder="RFC (requerido)" required></b-form-input>
+            <br>
+            <h4><b>Domicilio del prospecto</b></h4>
+            <b-form-input id="input-4" v-model="formData.calle" type="text" placeholder="Calle (requerido)" required></b-form-input>
+            <b-form-input id="input-5" v-model="formData.numero" type="number" placeholder="Numero (requerido)" required></b-form-input>
+            <b-form-input id="input-6" v-model="formData.colonia" type="text" placeholder="Colonia (requerido)" required></b-form-input>
+            <b-form-input id="input-7" v-model="formData.codigo_postal" type="number" placeholder="Codigo Postal (requerido)" required></b-form-input>
 
             <br>
-
-            <b-form-input id="input-4" v-model="form.calle" type="text" placeholder="Calle (requerido)" required></b-form-input>
-            <b-form-input id="input-5" v-model="form.numero" type="text" placeholder="Numero (requerido)" required></b-form-input>
-            <b-form-input id="input-6" v-model="form.colonia" type="text" placeholder="Colonia (requerido)" required></b-form-input>
-            <b-form-input id="input-7" v-model="form.cp" type="text" placeholder="Codigo Postal (requerido)" required></b-form-input>
+            <h4><b>Numero de contacto</b></h4>
+            <b-form-input id="input-8" v-model="formData.telefono" type="number" placeholder="Telefono (requerido)" required></b-form-input>
 
             <br>
-
-            <b-form-input id="input-8" v-model="form.telefono" type="text" placeholder="Telefono (requerido)" required></b-form-input>
-            <b-form-input id="input-9" v-model="form.rfc" type="text" placeholder="RFC (requerido)" required></b-form-input>
-
-            <br>
-
-            <b-form-file v-model="archivos" :state="Boolean(archivos)" placeholder="Seleccione o arrastre los archivos" drop-placeholder="Arrastre aquí" required/>
-            <div class="mt-3">Archivos seleccionados: {{ archivos ? archivos.name : '' }}</div>
+            <h4><b>Seleccion de archivos</b></h4>
+            <input accept=".jpg, .png, .pdf" type="file" ref="file" @change="evento_archivo" multiple required>
 
             <br>
-            
+            <br>
             <b-button-group>
                 <b-button type="submit" variant="success">Enviar</b-button>
                 <b-button variant="warning" @click="salir">Regresar al inicio</b-button>
             </b-button-group>
         </b-form>
-
-        <b-card class="mt-3" header="Form Data Result">
-            <pre class="m-0">{{ form }}</pre>
-        </b-card>
     </div>
 </template>
-
 <script>
+import axios from 'axios';
 export default{
+    name: "FormularioCandidatos",
     data(){
         return{
-            form: {
+            formData: {
                 nombre:'',
-                paterno:'',
-                materno:'',
+                apellido_paterno:'',
+                apellido_materno:'',
                 calle:'',
                 numero:'',
                 colonia:'',
-                cp:'',
+                codigo_postal:'',
                 telefono:'',
                 rfc:'',
             },
-            archivos: null
+            attachments:[],
         }
     },
     methods:{
         enviar(){
-            alert('enviado')
+            let formulario = new FormData()
+            for(let i=0; i<this.attachments.length;i++){
+                formulario.append('documentos[]',this.attachments[i]);
+            }
+            formulario.append('nombre',this.formData.nombre);
+            formulario.append('apellido_paterno',this.formData.apellido_paterno);
+            formulario.append('apellido_materno',this.formData.apellido_materno);
+            formulario.append('calle',this.formData.calle);
+            formulario.append('numero',this.formData.numero);
+            formulario.append('colonia',this.formData.colonia);
+            formulario.append('codigo_postal',this.formData.codigo_postal);
+            formulario.append('telefono',this.formData.telefono);
+            formulario.append('rfc',this.formData.rfc);
+            
+            axios.post('http://127.0.0.1:8000/api/prospecto',formulario,{
+                headers: {
+                    'Content-Type': "multipart/form-data"
+                }
+            })
+            .then(respuesta=>{
+                console.log(respuesta)
+                this.$router.push({ name: 'MenuCandidatos', query: { redirect: '/' } })
+            })
+            .catch(error =>{
+                console.log(error.data)
+            })
+            
         },
         salir(){
             if (confirm("Si sale perdera los datos capturados")) 
             {
-                window.location.href = "/"
+                this.$router.push({ name: 'MenuCandidatos', query: { redirect: '/' } })
+            }
+        },
+        evento_archivo(e){
+            let selectedFiles=e.target.files;
+
+            if(!selectedFiles.length){
+                return false;
+            }
+
+            for(let i=0;i<selectedFiles.length;i++){
+                this.attachments.push(selectedFiles[i]);
             }
         }
+    
     }
 }
 </script>

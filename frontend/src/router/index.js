@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import MenuCandidatos from '../views/MenuCandidatos.vue'
 import FormularioCandidatos from '../views/FormularioCandidatos.vue'
+import EvaluacionCandidatos from '../views/EvaluacionCandidatos.vue'
 
 Vue.use(VueRouter)
 
@@ -15,6 +16,11 @@ const routes = [
     path: '/formulario',
     name: 'FormularioCandidatos',
     component: FormularioCandidatos
+  },
+  {
+    path: '/evaluacion',
+    name: 'EvaluacionCandidatos',
+    component: EvaluacionCandidatos
   }
 ]
 
