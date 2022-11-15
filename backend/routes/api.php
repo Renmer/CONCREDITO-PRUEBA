@@ -26,9 +26,11 @@ Route::apiResource('prospecto',ProspectoController::class);
 
 Route::apiResource('documento',DocumentoController::class);
 
+
 Route::post('/archivo',function(Request $request){
     return \response()->download($request->input('url'));
 });
+
 
 Route::post('/estatus',function(Request $request){
     $catalogo_estatus = new EstatusModel();

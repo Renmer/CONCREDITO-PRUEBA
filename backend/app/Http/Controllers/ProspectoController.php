@@ -44,6 +44,17 @@ class ProspectoController extends Controller
 
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'nombre' => 'string|max:20|required',
+            'apellido_paterno' => 'string|max:20|required',
+            'telefono' => 'string|max:14|required',
+            'rfc' => 'string|max:13|required',
+            'calle' => 'string|max:20|required',
+            'numero' => 'string|max:5|required',
+            'colonia' => 'string|max:20|required',
+            'codigo_postal' => 'string|max:5|required',
+        ]);
+
         $catalogo_prospecto = new ProspectoModel();
         $catalogo_prospecto->set_nombre($request->nombre);
         $catalogo_prospecto->set_apellido_paterno($request->apellido_paterno);
@@ -75,9 +86,9 @@ class ProspectoController extends Controller
             $documento->storeAs('Documentos/prospecto'."$registro_prospecto",$nombre);
         }
         
-        if( $registro_prospecto || $registro_domicilio || $registro_estatus || $registro_documento)
+        if( $registro_prospecto && $registro_domicilio && $registro_estatus)
         {
-            return \response ("Datos registrados correctamente");
+            return \response ("Datos registrados correctamente",201);
         }
         else
         {
@@ -123,20 +134,6 @@ class ProspectoController extends Controller
 
         return \response ($_prospecto);
     }
-
-    // public function edit($id)
-    // {
-    //     $objeto = new LlavePrimariaModel();
-    //     $registro = $objeto->buscar_LlavePrimaria_id($id);
-    //     return view('editar', compact("registro",$registro));
-    // }
-
-    // public function update(Request $request, $id)
-    // {
-    //     $catalogo_prospecto = new ProspectoModel();
-    //     $registro = $catalogo_prospecto->buscar_buscar_informacion_prospecto_id($id);
-    //     return view('editar', compact("registro",$registro));
-    // }
 
     public function destroy($id)
     {
